@@ -1,0 +1,11 @@
+{
+  "watch": ["src"],
+  "ignore": [
+    "venv",
+    "node_modules",
+    "db",
+    "logs",
+    "documents"
+  ],
+  "ext": "js,json"
+}

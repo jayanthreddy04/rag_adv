@@ -1,0 +1,32 @@
+Retrieval-Augmented Generation (RAG) Architecture Overview
+
+Traditional Large Language Models (LLMs) are restricted to their static training data cutoff dates. RAG solves this by retrieving relevant information from an external private database at runtime and inserting it into the LLM's prompt context.
+
+--- Basic RAG Pipeline ---
+A basic RAG pipeline is simple:
+1. Ingestion: Take documents, split them into fixed-size chunks, embed them, and save them to a vector database.
+2. Retrieval: Embed the user's incoming query, run a vector similarity search, and retrieve the top-k chunks.
+3. Generation: Append the retrieved chunks directly to the system prompt and generate the final answer.
+
+--- Advanced RAG Pipeline Optimization ---
+Basic RAG has severe limitations: poor semantic representation of small chunks, retrieval of redundant chunks, and loss of global context. Advanced RAG overcomes these with several optimization techniques:
+
+1. Query Rewriting and Optimization:
+Using an LLM to rewrite user inputs before searching. For example, if a user asks a follow-up like "How fast is it?", the system rewrites it to "What is the processing speed and throughput of the Groq API?" based on conversation memory. This improves vector retrieval accuracy.
+
+2. Hybrid Search (Vector + BM25):
+Vector search excels at semantic matching (e.g. concept mapping) but struggles with specific numbers, serial numbers, product names, and alphanumeric codes. Keyword-based BM25 search excels at matching exact keywords. Combining both ensures high recall and precision.
+
+3. Reciprocal Rank Fusion (RRF):
+RRF merges ranking sheets from vector search and BM25 search. Because their raw scores are in completely different scales (similarity is 0-1, BM25 is unbounded), RRF uses the reciprocal of each item's rank:
+RRF_Score(doc) = Sum( 1 / (60 + rank_in_retriever) )
+This yields a unified ranking list without needing normalization.
+
+4. Context Reranking:
+Retrieving 15-20 chunks and narrowing them down to 3-5 high-relevance chunks using a local mathematical scorer or an LLM-based evaluator. This mitigates the "Lost in the Middle" effect, where LLMs fail to extract information placed in the middle of extremely long prompts.
+
+5. Duplicate Chunk Filtering:
+Removing identical or nearly-identical overlapping chunks that waste token space.
+
+6. Token Budget Control (Top-k Selection):
+Dynamically trimming context lengths to fit within safe prompt budgets, preventing out-of-token errors.

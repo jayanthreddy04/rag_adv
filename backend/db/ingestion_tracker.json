@@ -1,0 +1,27 @@
+{
+  "chromadb_guide.md": {
+    "hash": "3f3b6842cf7a636b82c55371e3afb82e",
+    "chunksCount": 3,
+    "ingestedAt": "2026-05-26T10:12:25.878Z"
+  },
+  "groq_api_performance.md": {
+    "hash": "46c82b964ee478d0bcd4e445d8cd7474",
+    "chunksCount": 4,
+    "ingestedAt": "2026-05-27T05:00:09.418Z"
+  },
+  "rag_architecture_overview.txt": {
+    "hash": "fd1a83f60fd6313368a5267585658e94",
+    "chunksCount": 3,
+    "ingestedAt": "2026-05-26T10:12:26.055Z"
+  },
+  "ibm_ganga.pdf": {
+    "hash": "8ff881678d1c9d1eb61121082644f595",
+    "chunksCount": 4,
+    "ingestedAt": "2026-05-27T05:36:53.879Z"
+  },
+  "langsmith_tracing_setup.md": {
+    "hash": "67cb7f5901401e5e44b0fa58b52a9050",
+    "chunksCount": 2,
+    "ingestedAt": "2026-05-27T05:53:14.096Z"
+  }
+}

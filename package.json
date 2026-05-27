@@ -1,0 +1,10 @@
+{
+  "name": "advanced-rag-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "vercel-build": "npm --prefix frontend run build"
+  }
+}

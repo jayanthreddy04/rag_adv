@@ -1,0 +1,210 @@
+[
+  {
+    "id": "chromadb_guide.md_chunk_0_3f3b6842",
+    "text": "# Advanced ChromaDB Developer Guide\n\nChromaDB is the AI-native open-source vector database designed to make it simple to build LLM apps by storing and querying embeddings. It focuses on developer productivity, simplicity, and scaling.\n\n## Core Concepts\n\n1. **Collections**: A collection in Chroma is analogous to a table in a relational database or a collection in MongoDB. It stores document text, embedding vectors, and metadata associated with each document.\n2. **Embeddings**: High-dimensional vector representations of text. By default, Chroma can generate them using sentence-transformers, but custom embeddings (like local HuggingFace or OpenAI) can be pushed directly.\n3. **HNWS Index**: ChromaDB uses Hierarchical Navigable Small World (HNSW) graphs for fast, approximate nearest neighbor (ANN) searches.\n\n## Distance Metrics\n\nChromaDB supports three distance functions to calculate similarity:",
+    "metadata": {
+      "source": "chromadb_guide.md",
+      "chunk_index": 0,
+      "total_chunks": 3,
+      "keywords": "chromadb,embeddings,developer,vector,database",
+      "word_count": 125,
+      "character_count": 903,
+      "ingested_at": "2026-05-26T10:12:23.913Z"
+    }
+  },
+  {
+    "id": "chromadb_guide.md_chunk_1_3f3b6842",
+    "text": "## Distance Metrics\n\nChromaDB supports three distance functions to calculate similarity:\n\n- **Squared L2 (Euclidean)**: Measures the straight-line distance between two points in Euclidean space. Lower distance indicates higher similarity. Formula: `l2`\n- **Cosine Distance**: Measures the cosine of the angle between two vectors, ignoring magnitude. Popular for textual semantics. Distance ranges from 0 to 2. Formula: `cosine`.\n- **Inner Product (IP)**: Calculated as the negative inner product (to align with distance minimization). Formula: `ip`.\n\nYou can configure the distance metric during collection creation:\n```javascript\nconst collection = await client.createCollection({\n  name: \"tech_docs\",\n  metadata: { \"hnsw:space\": \"cosine\" }\n});\n```\n\n## ChromaDB Querying and Metadata Filtering",
+    "metadata": {
+      "source": "chromadb_guide.md",
+      "chunk_index": 1,
+      "total_chunks": 3,
+      "keywords": "distance,cosine,formula,chromadb,similarity",
+      "word_count": 105,
+      "character_count": 794,
+      "ingested_at": "2026-05-26T10:12:25.790Z"
+    }
+  },
+  {
+    "id": "chromadb_guide.md_chunk_2_3f3b6842",
+    "text": "## ChromaDB Querying and Metadata Filtering\n\nChromaDB allows filtering results on metadata using a MongoDB-like query structure.\nExample:\n```javascript\nconst results = await collection.query({\n  queryEmbeddings: [[0.1, 0.2, ...]],\n  nResults: 5,\n  where: {\n    \"author\": \"john_doe\"\n  }\n});\n```\n\nSupported comparison operators include `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`. Logical operators include `$and` and `$or`.\n\n## HNSW Tuning Configurations\n\nYou can tune Chroma's performance by setting HNSW parameters in the metadata:\n- `hnsw:construction_ef`: Controls speed vs accuracy tradeoffs during index building (defaults to 100).\n- `hnsw:search_ef`: Controls speed vs accuracy tradeoffs during search query execution (defaults to 10).\n- `hnsw:M`: The maximum number of connection tracks per node in the graph (defaults to 16).",
+    "metadata": {
+      "source": "chromadb_guide.md",
+      "chunk_index": 2,
+      "total_chunks": 3,
+      "keywords": "metadata,defaults,chromadb,filtering,results",
+      "word_count": 112,
+      "character_count": 832,
+      "ingested_at": "2026-05-26T10:12:25.819Z"
+    }
+  },
+  {
+    "id": "rag_architecture_overview.txt_chunk_0_fd1a83f6",
+    "text": "Retrieval-Augmented Generation (RAG) Architecture Overview\n\nTraditional Large Language Models (LLMs) are restricted to their static training data cutoff dates. RAG solves this by retrieving relevant information from an external private database at runtime and inserting it into the LLM's prompt context.\n\n--- Basic RAG Pipeline ---\nA basic RAG pipeline is simple:\n1. Ingestion: Take documents, split them into fixed-size chunks, embed them, and save them to a vector database.\n2. Retrieval: Embed the user's incoming query, run a vector similarity search, and retrieve the top-k chunks.\n3. Generation: Append the retrieved chunks directly to the system prompt and generate the final answer.\n\n--- Advanced RAG Pipeline Optimization ---\nBasic RAG has severe limitations: poor semantic representation of small chunks, retrieval of redundant chunks, and loss of global context. Advanced RAG overcomes these with several optimization techniques:",
+    "metadata": {
+      "source": "rag_architecture_overview.txt",
+      "chunk_index": 0,
+      "total_chunks": 3,
+      "keywords": "chunks,basic,pipeline,generation,database",
+      "word_count": 137,
+      "character_count": 940,
+      "ingested_at": "2026-05-26T10:12:25.979Z"
+    }
+  },
+  {
+    "id": "rag_architecture_overview.txt_chunk_1_fd1a83f6",
+    "text": "1. Query Rewriting and Optimization:\nUsing an LLM to rewrite user inputs before searching. For example, if a user asks a follow-up like \"How fast is it?\", the system rewrites it to \"What is the processing speed and throughput of the Groq API?\" based on conversation memory. This improves vector retrieval accuracy.\n\n2. Hybrid Search (Vector + BM25):\nVector search excels at semantic matching (e.g. concept mapping) but struggles with specific numbers, serial numbers, product names, and alphanumeric codes. Keyword-based BM25 search excels at matching exact keywords. Combining both ensures high recall and precision.\n\n3. Reciprocal Rank Fusion (RRF):\nRRF merges ranking sheets from vector search and BM25 search. Because their raw scores are in completely different scales (similarity is 0-1, BM25 is unbounded), RRF uses the reciprocal of each item's rank:\nRRF_Score(doc) = Sum( 1 / (60 + rank_in_retriever) )\nThis yields a unified ranking list without needing normalization.",
+    "metadata": {
+      "source": "rag_architecture_overview.txt",
+      "chunk_index": 1,
+      "total_chunks": 3,
+      "keywords": "search,vector,excels,matching,numbers",
+      "word_count": 150,
+      "character_count": 977,
+      "ingested_at": "2026-05-26T10:12:26.002Z"
+    }
+  },
+  {
+    "id": "rag_architecture_overview.txt_chunk_2_fd1a83f6",
+    "text": "4. Context Reranking:\nRetrieving 15-20 chunks and narrowing them down to 3-5 high-relevance chunks using a local mathematical scorer or an LLM-based evaluator. This mitigates the \"Lost in the Middle\" effect, where LLMs fail to extract information placed in the middle of extremely long prompts.\n\n5. Duplicate Chunk Filtering:\nRemoving identical or nearly-identical overlapping chunks that waste token space.\n\n6. Token Budget Control (Top-k Selection):\nDynamically trimming context lengths to fit within safe prompt budgets, preventing out-of-token errors.",
+    "metadata": {
+      "source": "rag_architecture_overview.txt",
+      "chunk_index": 2,
+      "total_chunks": 3,
+      "keywords": "chunks,context,middle,token,reranking",
+      "word_count": 78,
+      "character_count": 555,
+      "ingested_at": "2026-05-26T10:12:26.035Z"
+    }
+  },
+  {
+    "id": "groq_api_performance.md_chunk_0_46c82b96",
+    "text": "# Groq API High-Speed Performance Report\n\nGroq is an AI infrastructure company that built the Language Processing Unit (LPU) Inference Engine. The LPU is a new processor architecture designed specifically for the sequential and intensive nature of LLM workloads.\n\n## LPU Architecture vs Traditional GPU\n\nTraditional Graphics Processing Units (GPUs) are designed for massive parallel graphics workloads, featuring thousands of slow threads. When running LLM inference, GPUs are often memory-bandwidth bottlenecked, as they wait for model weights to load from High Bandwidth Memory (HBM).",
+    "metadata": {
+      "source": "groq_api_performance.md",
+      "chunk_index": 0,
+      "total_chunks": 4,
+      "keywords": "processing,inference,architecture,designed,workloads",
+      "word_count": 84,
+      "character_count": 586,
+      "ingested_at": "2026-05-27T05:00:09.292Z"
+    }
+  },
+  {
+    "id": "groq_api_performance.md_chunk_1_46c82b96",
+    "text": "Groq's LPU is a Tensor Streaming Processor (TSP) that features:\n- **SRAM-only memory**: The entire model is loaded directly into ultra-fast SRAM memory on the chip. There is zero external memory access delay, enabling extremely high bandwidth.\n- **Deterministic hardware execution**: Execution is scheduled at compile-time by the software compiler rather than at runtime by hardware schedulers. This guarantees deterministic latency and zero jitter.\n\n## Inference Performance Benchmarks (Tokens Per Second)\n\nGroq achieves record-breaking generation speeds on popular open-weights models:\n\n- **Llama 3.1 8B Instant**: Up to 800 - 1200 tokens per second (T/s) per user.\n- **Llama 3.3 70b SpecDec**: Up to 250 - 450 tokens per second (T/s) per user.\n- **Mixtral 8x7B 32768**: Up to 250 - 350 tokens per second (T/s) per user.",
+    "metadata": {
+      "source": "groq_api_performance.md",
+      "chunk_index": 1,
+      "total_chunks": 4,
+      "keywords": "tokens,second,memory,deterministic,hardware",
+      "word_count": 127,
+      "character_count": 822,
+      "ingested_at": "2026-05-27T05:00:09.328Z"
+    }
+  },
+  {
+    "id": "groq_api_performance.md_chunk_2_46c82b96",
+    "text": "This high speed enables real-time multi-agent workflows, long query expansions, and real-time reranking that would otherwise be sluggish on standard GPU hardware (where speed is typically 15 - 50 T/s).\n\n## API Integration Details\n\nThe Groq NodeJS SDK is compatible with the standard OpenAI API structure.\nConnection configuration example:\n```javascript\nimport { Groq } from 'groq-sdk';\n\nconst groq = new Groq({\n  apiKey: process.env.GROQ_API_KEY\n});\n\nconst chatCompletion = await groq.chat.completions.create({\n  messages: [{ role: 'user', content: 'Explain LPUs.' }],\n  model: 'llama-3.3-70b-versatile',\n  temperature: 0.2,\n  stream: true\n});\n```",
+    "metadata": {
+      "source": "groq_api_performance.md",
+      "chunk_index": 2,
+      "total_chunks": 4,
+      "keywords": "speed,realtime,standard,const,enables",
+      "word_count": 85,
+      "character_count": 647,
+      "ingested_at": "2026-05-27T05:00:09.359Z"
+    }
+  },
+  {
+    "id": "groq_api_performance.md_chunk_3_46c82b96",
+    "text": "const chatCompletion = await groq.chat.completions.create({\n  messages: [{ role: 'user', content: 'Explain LPUs.' }],\n  model: 'llama-3.3-70b-versatile',\n  temperature: 0.2,\n  stream: true\n});\n```\n\n### Groq Supported Models list\n1. `llama-3.3-70b-versatile` - highly capable general generation model and the replacement for the decommissioned `llama3-70b-8192`.\n2. `llama-3.1-8b-instant` - long-context, ultra-low-latency model for query rewriting and production RAG utilities.\n3. `mixtral-8x7b-32768` - 32k context window, high accuracy, MOE model.\n4. `gemma2-9b-it` - 8k context window, Google's lightweight open model.",
+    "metadata": {
+      "source": "groq_api_performance.md",
+      "chunk_index": 3,
+      "total_chunks": 4,
+      "keywords": "model,llamabversatile,context,window,const",
+      "word_count": 74,
+      "character_count": 621,
+      "ingested_at": "2026-05-27T05:00:09.383Z"
+    }
+  },
+  {
+    "id": "ibm_ganga.pdf_chunk_0_8ff88167",
+    "text": "LEAN CANVAS\nAI-Based Student Doubt Chatbot\n Problem\n• No instant answers\n• Limited teachers\n• Complex concepts\n• No personalization\n Solution\n• AI chatbot\n• Subject classification\n• Simple explanations\n• 24/7 support\n Value Proposition\n• Instant support\n• Easy UI\n• Anytime access\n• Better learning\n Advantage\n• Fast response\n• Simple UI\n• AI-based\n• Personalized\n Alternatives\n• YouTube\n• Coursera\n• Classroom\n• Basic bots\n Key Metrics\n• Users\n• Queries solved\n• Accuracy\n• Satisfaction\n Customers\n• School\n• College\n• Aspirants\n Channels\n• Web app\n• Mobile access\n Cost Structure\n• Development\n• Hosting\n• API\n• Maintenance\n Revenue Streams\n• Freemium\n• Subscription\n• Premium features",
+    "metadata": {
+      "source": "ibm_ganga.pdf",
+      "chunk_index": 0,
+      "total_chunks": 4,
+      "keywords": "aibased,chatbot,instant,simple,support",
+      "word_count": 122,
+      "character_count": 697,
+      "ingested_at": "2026-05-27T05:36:53.679Z"
+    }
+  },
+  {
+    "id": "ibm_ganga.pdf_chunk_1_8ff88167",
+    "text": "Student Doubt Chatbot\n1. Introduction\nNowadays, students face many doubts while studying different\nsubjects. Sometimes teachers are not available all the time, and\nsearching answers online may not always be helpful. Because of\nthis, students may lose interest or waste time. To solve this\nproblem, a Student Doubt Chatbot is proposed.\n2. Problem Statement\nMany students are not able to clear their doubts instantly. They\ndepend on teachers or online resources, which may take time or\ngive confusing explanations. This affects their learning and\nunderstanding of concepts.\n3. Proposed Solution\nThe proposed system is a chatbot where students can type their\ndoubts. The chatbot will read the question, understand it, and give\na suitable answer. It will also try to identify the subject of the\nquestion, like maths or science.\nThe chatbot will respond in a simple and understandable way so\nthat students can learn easily.\n4. Objectives\nTo help students clear doubts quickly",
+    "metadata": {
+      "source": "ibm_ganga.pdf",
+      "chunk_index": 1,
+      "total_chunks": 4,
+      "keywords": "students,chatbot,doubts,proposed,student",
+      "word_count": 154,
+      "character_count": 970,
+      "ingested_at": "2026-05-27T05:36:53.798Z"
+    }
+  },
+  {
+    "id": "ibm_ganga.pdf_chunk_2_8ff88167",
+    "text": "question, like maths or science.\nThe chatbot will respond in a simple and understandable way so\nthat students can learn easily.\n4. Objectives\nTo help students clear doubts quickly\nTo provide answers in simple language\nTo make learning more interactive\nTo reduce dependency on others\n5. Technologies Used\nFrontend: React (Vite) with Tailwind CSS\nBackend: Python with FastAPI\nAI Flow: LangGraph\nDatabase: Supabase\nConcept note",
+    "metadata": {
+      "source": "ibm_ganga.pdf",
+      "chunk_index": 2,
+      "total_chunks": 4,
+      "keywords": "simple,students,question,maths,science",
+      "word_count": 65,
+      "character_count": 424,
+      "ingested_at": "2026-05-27T05:36:53.822Z"
+    }
+  },
+  {
+    "id": "ibm_ganga.pdf_chunk_3_8ff88167",
+    "text": "6. Methodology\nFirst, the user enters a question in the chat interface. The\nbackend receives the query and processes it. Then the\nsystem tries to identify the subject and generate a\nresponse. Finally, the answer is shown to the user in the\nchat format.\n7. Expected Outcome\nThe chatbot will help students get quick answers to their\ndoubts. It will save time and improve understanding.\nStudents can use it anytime for learning support.\n8. Conclusion\nThe Student Doubt Chatbot is a simple and useful solution\nfor students. It makes learning easier by providing instant\nhelp. This project can be improved further by adding more\nfeatures in the future.\n9.Contact Information\nName:Gundamoni Ganga\nEmail:23eg107e18@anurag.edu.in\nInstitution:Anurag University",
+    "metadata": {
+      "source": "ibm_ganga.pdf",
+      "chunk_index": 3,
+      "total_chunks": 4,
+      "keywords": "students,chatbot,learning,methodology,first",
+      "word_count": 115,
+      "character_count": 751,
+      "ingested_at": "2026-05-27T05:36:53.834Z"
+    }
+  },
+  {
+    "id": "langsmith_tracing_setup.md_chunk_0_67cb7f59",
+    "text": "# LangSmith Tracing Setup\n\nThis backend is instrumented with LangSmith manual tracing for the RAG request path.\n\n## What Gets Traced\n\nEach `/api/chat` request creates a root `rag.chat` trace. The trace contains child runs for:\n\n- `rag.query_rewrite`\n- `rag.hybrid_retrieval`\n- `rag.rerank`\n- `rag.context_selection`\n- `rag.groq_generation`\n\nTrace payloads are summarized to include useful metadata, chunk IDs, source filenames, relevance scores, and short previews rather than full oversized documents.\n\n## Environment Variables\n\nSet these in `backend/.env`:\n\n```env\nLANGSMITH_TRACING=true\nLANGSMITH_API_KEY=your_langsmith_api_key\nLANGSMITH_PROJECT=advanced-rag-local\nLANGSMITH_ENDPOINT=https://api.smith.langchain.com\n```\n\nRestart the backend after changing these values.\n\n## Run Locally\n\nStart ChromaDB:\n\n```bash\n./backend/scripts/start-chroma.sh\n```\n\nStart the backend:\n\n```bash\ncd backend\nnpm run dev\n```\n\nStart the frontend:\n\n```bash\ncd frontend\nnpm run dev\n```",
+    "metadata": {
+      "source": "langsmith_tracing_setup.md",
+      "chunk_index": 0,
+      "total_chunks": 2,
+      "keywords": "backend,trace,start,langsmith,tracing",
+      "word_count": 115,
+      "character_count": 966,
+      "ingested_at": "2026-05-27T05:53:13.920Z"
+    }
+  },
+  {
+    "id": "langsmith_tracing_setup.md_chunk_1_67cb7f59",
+    "text": "## Run Locally\n\nStart ChromaDB:\n\n```bash\n./backend/scripts/start-chroma.sh\n```\n\nStart the backend:\n\n```bash\ncd backend\nnpm run dev\n```\n\nStart the frontend:\n\n```bash\ncd frontend\nnpm run dev\n```\n\nAsk a question in the UI, then open LangSmith and select the project configured in `LANGSMITH_PROJECT`.",
+    "metadata": {
+      "source": "langsmith_tracing_setup.md",
+      "chunk_index": 1,
+      "total_chunks": 2,
+      "keywords": "start,backend,frontend,locally,chromadb",
+      "word_count": 44,
+      "character_count": 297,
+      "ingested_at": "2026-05-27T05:53:14.058Z"
+    }
+  }
+]
